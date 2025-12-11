@@ -17,20 +17,6 @@ st.set_page_config(page_title="Mask Detection App", layout="wide")
 @st.cache_resource
 def load_model():
     if os.path.exists(MODEL_PATH):
-        # Debug: Check file size
-        file_size = os.path.getsize(MODEL_PATH)
-        st.write(f"Debug: Model file size: {file_size} bytes")
-        
-        if file_size < 1000:
-            st.error("Model file is too small. It might be a Git LFS pointer or corrupted.")
-            with open(MODEL_PATH, 'r') as f:
-                try:
-                    content = f.read()
-                    st.code(content)
-                except:
-                    pass
-            return None
-
         try:
             return YOLO(MODEL_PATH)
         except Exception as e:
