@@ -16,15 +16,34 @@ st.set_page_config(page_title="Mask Detection App", layout="wide")
 
 @st.cache_resource
 def load_model():
-    if os.path.exists(MODEL_PATH):
-        try:
-            return YOLO(MODEL_PATH)
-        except Exception as e:
-            st.error(f"Error loading model: {e}")
-            return None
-    else:
+    if not os.path.exists(MODEL_PATH):
         st.error(f"Model file not found at: {MODEL_PATH}")
         return None
+
+    # Robust loading with retries
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            # Integrity check / Warm-up
+            file_size = os.path.getsize(MODEL_PATH)
+            if file_size < 1000:
+                st.error(f"Model file is too small ({file_size} bytes). Likely corrupted.")
+                return None
+            
+            # Force a small read to ensure file system is ready
+            with open(MODEL_PATH, 'rb') as f:
+                f.read(1024)
+
+            return YOLO(MODEL_PATH)
+        except Exception as e:
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(1) # Wait a bit before retrying
+                continue
+            
+            st.error(f"Error loading model (Attempt {attempt+1}/{max_retries}): {e}")
+            return None
+    return None
 
 def save_data(counts):
     timestamp = datetime.now()
