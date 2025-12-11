@@ -17,8 +17,20 @@ st.set_page_config(page_title="Mask Detection App", layout="wide")
 @st.cache_resource
 def load_model():
     if os.path.exists(MODEL_PATH):
-        return YOLO(MODEL_PATH)
-    return None
+        try:
+            return YOLO(MODEL_PATH)
+        except Exception as e:
+            st.error(f"Error loading model: {e}")
+            return None
+    else:
+        st.error(f"Model file not found at: {MODEL_PATH}")
+        st.write(f"Current working directory: {os.getcwd()}")
+        if os.path.exists(BASE_DIR):
+             st.write(f"Files in {BASE_DIR}: {os.listdir(BASE_DIR)}")
+             models_dir = os.path.join(BASE_DIR, 'models')
+             if os.path.exists(models_dir):
+                 st.write(f"Files in {models_dir}: {os.listdir(models_dir)}")
+        return None
 
 def save_data(counts):
     timestamp = datetime.now()
