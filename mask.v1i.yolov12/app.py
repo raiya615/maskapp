@@ -16,19 +16,6 @@ st.set_page_config(page_title="Mask Detection App", layout="wide")
 
 @st.cache_resource
 def load_model():
-    # Debugging info
-    st.write(f"Debug: BASE_DIR = {BASE_DIR}")
-    st.write(f"Debug: MODEL_PATH = {MODEL_PATH}")
-    
-    if os.path.exists(BASE_DIR):
-        st.write(f"Files in BASE_DIR: {os.listdir(BASE_DIR)}")
-        
-    models_dir = os.path.join(BASE_DIR, 'models')
-    if os.path.exists(models_dir):
-        st.write(f"Files in models dir: {os.listdir(models_dir)}")
-    else:
-        st.error(f"Models directory not found at {models_dir}")
-
     if os.path.exists(MODEL_PATH):
         return YOLO(MODEL_PATH)
     return None
